@@ -45,6 +45,7 @@ const GF_FilterRegister *isoffin_register(GF_FilterSession *session);
 const GF_FilterRegister *bifs_dec_register(GF_FilterSession *session);
 const GF_FilterRegister *odf_dec_register(GF_FilterSession *session);
 const GF_FilterRegister *filein_register(GF_FilterSession *session);
+const GF_FilterRegister *pcapin_register(GF_FilterSession *session);
 const GF_FilterRegister *ctxload_register(GF_FilterSession *session);
 const GF_FilterRegister *httpin_register(GF_FilterSession *session);
 const GF_FilterRegister *svgin_register(GF_FilterSession *session);
@@ -160,6 +161,7 @@ void gf_fs_reg_all(GF_FilterSession *fsess, GF_FilterSession *a_sess)
 	gf_fs_add_filter_register(fsess, bifs_dec_register(a_sess) );
 	gf_fs_add_filter_register(fsess, odf_dec_register(a_sess) );
 	gf_fs_add_filter_register(fsess, filein_register(a_sess) );
+	gf_fs_add_filter_register(fsess, pcapin_register(a_sess) );
 	gf_fs_add_filter_register(fsess, ctxload_register(a_sess) );
 	gf_fs_add_filter_register(fsess, httpin_register(a_sess) );
 	gf_fs_add_filter_register(fsess, svgin_register(a_sess) );
