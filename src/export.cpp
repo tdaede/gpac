@@ -75,6 +75,7 @@
 #pragma comment (linker, EXPORT_SYMBOL(gf_sys_profiler_send) )
 #pragma comment (linker, EXPORT_SYMBOL(gf_sys_profiler_enable_sampling) )
 #pragma comment (linker, EXPORT_SYMBOL(gf_sys_profiler_sampling_enabled) )
+#pragma comment (linker, EXPORT_SYMBOL(gf_sys_is_multithread) )
 
 #ifdef GPAC_ENABLE_COVERAGE
 #pragma comment (linker, EXPORT_SYMBOL(gf_sys_is_cov_mode) )

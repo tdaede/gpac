@@ -99,6 +99,8 @@ GF_FilterRegister *dtout_register(GF_FilterSession *session)
 	DTOutRegister.finalize = dtout_finalize;
 	DTOutRegister.configure_pid = dtout_configure_pid;
 	DTOutRegister.process = dtout_process;
+	//filter is threaded (we fetch packets in hardware callbacks)
+	DTOutRegister.flags = GF_FS_REG_THREADED;
 #else
 	DTOutRegister.process = dtout_process_dummy;
 

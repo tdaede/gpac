@@ -290,7 +290,8 @@ GF_FilterSession *gf_fs_new(s32 nb_threads, GF_FilterSchedulerType sched_type, u
 	fsess->blacklist = NULL;
 
 	//todo - find a way to handle events without mutex ...
-	fsess->evt_mx = gf_mx_new("Event mutex");
+	if (gf_sys_is_multithread())
+		fsess->evt_mx = gf_mx_new("Event mutex");
 
 	fsess->blocking_mode = GF_FS_BLOCK_ALL;
 	opt = gf_opts_get_key("core", "no-block");

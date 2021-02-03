@@ -206,7 +206,6 @@ void gf_modules_new(GF_Config *config)
 	GF_SAFEALLOC(gpac_modules_static, GF_ModuleManager);
 	if (!gpac_modules_static) return;
 	gpac_modules_static->cfg = config;
-	gpac_modules_static->mutex = gf_mx_new("Module Manager");
 	gf_modules_refresh_module_directories();
 
 	/* Initialize module list */

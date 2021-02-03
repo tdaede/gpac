@@ -881,7 +881,26 @@ void gf_log_reset_file()
 static Bool gpac_has_global_filter_args=GF_FALSE;
 static Bool gpac_has_global_filter_meta_args=GF_FALSE;
 #include <gpac/thread.h>
+#include "module_wrap.h"
+
 GF_Mutex *logs_mx = NULL;
+extern GF_ModuleManager *gpac_modules_static;
+
+static void gf_sys_setup_multithread()
+{
+	if (!logs_mx)
+		logs_mx = gf_mx_new("Logs");
+	assert(gpac_modules_static);
+	if (!gpac_modules_static->mutex)
+		gpac_modules_static->mutex = gf_mx_new("Module Manager");
+}
+
+GF_EXPORT
+Bool gf_sys_is_multithread()
+{
+	if (logs_mx) return GF_TRUE;
+	return GF_FALSE;
+}
 
 Bool gf_sys_has_filter_global_args()
 {
@@ -968,6 +987,9 @@ GF_Err gf_sys_set_args(s32 argc, const char **argv)
 				if (!use_sep) i += 1;
 			} else if (gf_opts_load_option(arg, arg_val, &consumed, &e)) {
 				if (e) return e;
+
+				if (!strcmp(arg, "-threads"))
+					gf_sys_setup_multithread();
 				
 				if (consumed && !use_sep)
 					i += 1;
@@ -1151,6 +1173,10 @@ GF_Err gf_sys_profiler_set_callback(void *udta, gf_rmt_user_callback usr_cbk)
 	if (remotery_handle) {
 		rmt_udta = udta;
 		rmt_usr_cbk = usr_cbk;
+		//rmt websocket server runs in its own thread - we may need to enable multithread upon activating RMT, to check
+		if (udta) {
+			gf_sys_setup_multithread();
+		}
 		return GF_OK;
 	}
 	return GF_BAD_PARAM;
@@ -1336,9 +1362,6 @@ GF_Err gf_sys_init(GF_MemTrackerType mem_tracker_type, const char *profile)
 #ifndef _WIN32_WCE
 		setlocale( LC_NUMERIC, "C" );
 #endif
-
-
-		logs_mx = gf_mx_new("Logs");
 
 		gf_rand_init(GF_FALSE);
 		

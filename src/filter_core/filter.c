@@ -247,11 +247,16 @@ GF_Filter *gf_filter_new(GF_FilterSession *fsess, const GF_FilterRegister *freg,
 		filter->pcks_mx = gf_mx_new(szName);
 	}
 
-	//for now we always use a lock on the filter task lists
-	//this mutex protects the task list and the number of process virtual tasks
-	//we cannot remove it in non-threaded mode since we have no garantee that a filter won't use threading on its own
-	snprintf(szName, 200, "Filter%sTasks", filter->freg->name);
-	filter->tasks_mx = gf_mx_new(szName);
+	//We always use a lock on the filter task lists in multithreaded mode or single-thread if the filter is threaded
+	//this mutex protects the task list, the number of process virtual tasks and input/output PIDs
+	if (gf_sys_is_multithread() || (filter->freg->flags & GF_FS_REG_THREADED)) {
+		snprintf(szName, 200, "Filter%sTasks", filter->freg->name);
+		filter->tasks_mx = gf_mx_new(szName);
+
+		//create session event mutex in case we just enabled multithread
+		if (!fsess->evt_mx)
+			fsess->evt_mx = gf_mx_new("Event mutex");
+	}
 
 	filter->tasks = gf_fq_new(filter->tasks_mx);
 

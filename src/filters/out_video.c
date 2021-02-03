@@ -2034,7 +2034,8 @@ GF_FilterRegister VideoOutRegister = {
 	"The pixel format of the dumped frame is always RGB in OpenGL and matches the video backbuffer format in 2D mode.\n"\
 	)
 	.private_size = sizeof(GF_VideoOutCtx),
-	.flags = GF_FS_REG_MAIN_THREAD,
+	//we want main thread to call us, and event subsystem may be threaded depending on the underlying video out module
+	.flags = GF_FS_REG_MAIN_THREAD | GF_FS_REG_THREADED,
 	.args = VideoOutArgs,
 	SETCAPS(VideoOutCaps),
 	.initialize = vout_initialize,

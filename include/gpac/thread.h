@@ -252,6 +252,14 @@ The mutex object allows ensuring that portions of the code (typically access to 
 */
 
 /*!
+\brief Check for multithread
+
+Checks if multithread is enabled. Multithread must be initialized using -threads core option passed to \ref gf_sys_set_args
+\return GF_TRUE if multithreading is enabled, GF_FALSE otherwise
+*/
+Bool gf_sys_is_multithread();
+
+/*!
 \brief abstracted mutex object*/
 typedef struct __tag_mutex GF_Mutex;
 /*!
@@ -273,22 +281,24 @@ void gf_mx_del(GF_Mutex *mx);
 \brief mutex locking
 
 Locks the mutex object, making sure that another thread locking this mutex cannot execute until the mutex is unlocked.
-\param mx the mutex object
+\param mx the mutex object, may be NULL (return 0 in this case)
 \return 1 if success, 0 if error locking the mutex (which should never happen)
 */
 u32 gf_mx_p(GF_Mutex *mx);
+
 /*!
 \brief mutex unlocking
 
 Unlocks the mutex object, allowing other threads waiting on this mutex to continue their execution
-\param mx the mutex object
+\param mx the mutex object, may be NULL
 */
 void gf_mx_v(GF_Mutex *mx);
+
 /*!
 \brief mutex non-blocking lock
 
 Attemps to lock the mutex object without blocking until the object is released.
-\param mx the mutex object
+\param mx the mutex object, may be NULL (return GF_FALSE in this case)
 \return GF_TRUE if the mutex has been successfully locked, in which case it shall then be unlocked, or GF_FALSE if the mutex is locked by another thread.
 */
 Bool gf_mx_try_lock(GF_Mutex *mx);
@@ -297,7 +307,7 @@ Bool gf_mx_try_lock(GF_Mutex *mx);
 \brief get mutex number of locks
 
 Returns the number of locks on the mutex if the caller thread is holding the mutex.
-\param mx the mutex object
+\param mx the mutex object, may be NULL (return 0 in this case)
 \return -1 if the mutex is not hold by the calling thread, or the number of locks (possibly 0) otherwise.
  */
 s32 gf_mx_get_num_locks(GF_Mutex *mx);

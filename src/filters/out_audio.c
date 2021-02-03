@@ -658,6 +658,8 @@ GF_FilterRegister AudioOutRegister = {
 	.private_size = sizeof(GF_AudioOutCtx),
 	.args = AudioOutArgs,
 	SETCAPS(AudioOutCaps),
+	//filter is threaded for most underlying audio output modules (we fetch packets in hardware callbacks)
+	.flags = GF_FS_REG_THREADED,
 	.initialize = aout_initialize,
 	.finalize = aout_finalize,
 	.configure_pid = aout_configure_pid,

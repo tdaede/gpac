@@ -1974,6 +1974,9 @@ typedef enum
 	/*! Indicates the filter requires graph resolver (typically because it creates new destinations/sinks at run time)*/
 	GF_FS_REG_REQUIRES_RESOLVER = 1<<11,
 
+	/*! Indicates the filter uses threads performing filter IO. It is the filter responsability to make sure no concurrent access to the filter API by its internal threads is done.
+	*/
+	GF_FS_REG_THREADED = 1<<12,
 
 	/*! flag dynamically set at runtime for custom filters*/
 	GF_FS_REG_CUSTOM = 0x40000000,
