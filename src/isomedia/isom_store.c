@@ -1,4 +1,3 @@
-
 /*
  *			GPAC - Multimedia Framework C SDK
  *
@@ -730,6 +729,7 @@ GF_Err DoWriteMeta(GF_ISOFile *file, GF_MetaBox *meta, GF_BitStream *bs, Bool Em
 			if (iloc->construction_method != 2) {
 				iloc->base_offset = baseOffset;
 			}
+//      iloc->base_offset = 28;
 
 			/*new resource*/
 			if (iinf && (iinf->full_path || (iinf->tk_id && iinf->sample_num))) {
@@ -751,7 +751,7 @@ GF_Err DoWriteMeta(GF_ISOFile *file, GF_MetaBox *meta, GF_BitStream *bs, Bool Em
 				}
 				entry = (GF_ItemExtentEntry *)gf_list_get(iloc->extent_entries, 0);
 				entry->extent_offset = 0;
-				entry->extent_length = it_size;
+				entry->extent_length = it_size; /// THIS ONE
 
 				//shared data, do not count it
 				if (iinf->tk_id && iinf->sample_num) {
@@ -763,23 +763,27 @@ GF_Err DoWriteMeta(GF_ISOFile *file, GF_MetaBox *meta, GF_BitStream *bs, Bool Em
 				}
 
 				/*OK write to mdat*/
-				if (!Emulation) {
-					if (iinf->tk_id && iinf->sample_num) {
-					}
-					else if (src) {
-						char cache_data[4096];
-						u64 remain = entry->extent_length;
-						while (remain) {
-							u32 size_cache = (remain>4096) ? 4096 : (u32) remain;
-							size_t read = gf_fread(cache_data, size_cache, src);
-							if (read ==(size_t) -1) break;
-							gf_bs_write_data(bs, cache_data, (u32) read);
-							remain -= (u32) read;
-						}
-					} else {
-						gf_bs_write_data(bs, iinf->full_path, iinf->data_len);
-					}
-				}
+        if (1) {
+          if (!Emulation) {
+            if (iinf->tk_id && iinf->sample_num) {
+            }
+            else if (src) {
+              char cache_data[4096];
+              u64 remain = entry->extent_length;
+              while (remain) {
+                u32 size_cache = (remain>4096) ? 4096 : (u32) remain;
+                size_t read = gf_fread(cache_data, size_cache, src);
+                if (read ==(size_t) -1) break;
+                gf_bs_write_data(bs, cache_data, (u32) read);
+                remain -= (u32) read;
+              }
+            } else {
+              gf_bs_write_data(bs, iinf->full_path, iinf->data_len);
+            }
+          }
+        } else {
+          it_size = 0;
+        }
 				if (src) gf_fclose(src);
 			}
 			else if (gf_list_count(iloc->extent_entries)) {

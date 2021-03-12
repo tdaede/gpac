@@ -126,7 +126,7 @@ GF_Err obumx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)
 			return GF_NON_COMPLIANT_BITSTREAM;
 		}
 		ctx->av1b_cfg_size = 0;
-
+/*
 		while ((obu = gf_list_enum(ctx->av1c->obu_array, &i))) {
 			//we don't output sequence header since it shall be present in sync sample
 			//this avoids creating duplicate of the seqeunce header in the output stream
@@ -140,6 +140,7 @@ GF_Err obumx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)
 			ctx->av1b_cfg_size += (u32) obu->obu_length;
 			ctx->av1b_cfg_size += gf_av1_leb128_size(obu->obu_length);
 		}
+		*/
 	}
 
 

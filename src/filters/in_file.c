@@ -92,7 +92,7 @@ static GF_Err filein_initialize(GF_Filter *filter)
 			}
 		}
 
-		if (!ctx->block_size) ctx->block_size = 5000;
+		if (!ctx->block_size) ctx->block_size = 50000;
 		while (ctx->block_size % 4) ctx->block_size++;
 		ctx->block = gf_malloc(ctx->block_size +1);
 		return GF_OK;
@@ -188,7 +188,7 @@ static GF_Err filein_initialize(GF_Filter *filter)
 	if (!ctx->block) {
 		if (!ctx->block_size) {
 			if (ctx->file_size>500000000) ctx->block_size = 1000000;
-			else ctx->block_size = 5000;
+			else ctx->block_size = 666666;
 		}
 		ctx->block = gf_malloc(ctx->block_size +1);
 	}
