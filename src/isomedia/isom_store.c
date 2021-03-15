@@ -1,4 +1,3 @@
-
 /*
  *			GPAC - Multimedia Framework C SDK
  *
@@ -678,7 +677,7 @@ GF_Err DoWriteMeta(GF_ISOFile *file, GF_MetaBox *meta, GF_BitStream *bs, Bool Em
 			if (iloc->construction_method != 2) {
 				iloc->base_offset = baseOffset;
 			}
-      iloc->base_offset = 20;
+      iloc->base_offset = 28;
 
 			/*new resource*/
 			if (iinf && (iinf->full_path || (iinf->tk_id && iinf->sample_num))) {
