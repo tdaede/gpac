@@ -1741,6 +1741,8 @@ static void av1_parse_sequence_header_obu(GF_BitStream *bs, AV1State *state)
 	state->frame_height_bits_minus_1 = gf_bs_read_int_log(bs, 4, "frame_height_bits_minus1");
 	state->width = gf_bs_read_int_log(bs, state->frame_width_bits_minus_1 + 1, "width_minus1") + 1;
 	state->height = gf_bs_read_int_log(bs, state->frame_height_bits_minus_1 + 1, "height_minus1") + 1;
+	state->sequence_width = state->width;
+	state->sequence_height = state->height;
 	state->frame_id_numbers_present_flag = GF_FALSE;
 	if (!state->reduced_still_picture_header) {
 		state->frame_id_numbers_present_flag = gf_bs_read_int_log(bs, 1, "frame_id_numbers_present_flag");
@@ -2438,7 +2440,7 @@ u64 gf_av1_leb128_write(GF_BitStream *bs, u64 value)
 	return leb_size;
 }
 
-#define OBU_BLOCK_SIZE 4096
+#define OBU_BLOCK_SIZE 40960
 static void av1_add_obu_internal(GF_BitStream *bs, u64 pos, u64 obu_length, ObuType obu_type, GF_List **obu_list, AV1State *state)
 {
 	char block[OBU_BLOCK_SIZE];
@@ -2563,14 +2565,18 @@ GF_Err aom_av1_parse_temporal_unit_from_section5(GF_BitStream *bs, AV1State *sta
 
 	while (state->obu_type != OBU_TEMPORAL_DELIMITER) {
 		GF_Err e;
-		if (!gf_bs_available(bs))
+		if (!gf_bs_available(bs)) {
+			printf("buffer too small\n");
 			return state->unframed ? GF_BUFFER_TOO_SMALL : GF_OK;
+		}
 
 		u64 pos = gf_bs_get_position(bs), obu_length = 0;
 
 		e = gf_av1_parse_obu(bs, &state->obu_type, &obu_length, NULL, state);
-		if (e)
+		if (e) {
+			printf("obu parsing failure %d\n", e);
 			return e;
+		}
 
 		if (obu_length != gf_bs_get_position(bs) - pos) {
 			GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, ("[AV1] OBU (Section 5) frame size "LLU" different from consumed bytes "LLU".\n", obu_length, gf_bs_get_position(bs) - pos));
@@ -2898,6 +2904,7 @@ static void superres_params(GF_BitStream *bs, AV1State *state)
 static void av1_frame_size(GF_BitStream *bs, AV1State *state, Bool frame_size_override_flag)
 {
 	if (frame_size_override_flag) {
+		printf("frame size override\n");
 		u32 frame_width_minus_1, frame_height_minus_1;
 		u8 n = state->frame_width_bits_minus_1 + 1;
 		frame_width_minus_1 = gf_bs_read_int_log(bs, n, "frame_width_minus_1");
@@ -2905,6 +2912,9 @@ static void av1_frame_size(GF_BitStream *bs, AV1State *state, Bool frame_size_ov
 		frame_height_minus_1 = gf_bs_read_int_log(bs, n, "frame_height_minus_1");
 		state->width = frame_width_minus_1 + 1;
 		state->height = frame_height_minus_1 + 1;
+	} else {
+		state->width = state->sequence_width;
+		state->height = state->sequence_height;
 	}
 	superres_params(bs, state);
 	//compute_image_size(); //no bits
@@ -2914,10 +2924,8 @@ static void av1_render_size(GF_BitStream *bs)
 {
 	Bool render_and_frame_size_different = gf_bs_read_int_log(bs, 1, "render_and_frame_size_different_flag");
 	if (render_and_frame_size_different == GF_TRUE) {
-		gf_bs_read_int_log(bs, 16, "render_width_minus_1");
-		gf_bs_read_int_log(bs, 16, "render_height_minus_1");
-		//RenderWidth = render_width_minus_1 + 1;
-		//RenderHeight = render_height_minus_1 + 1;
+		u32 render_width_minus_1 = gf_bs_read_int_log(bs, 16, "render_width_minus_1");
+		u32 render_height_minus_1 = gf_bs_read_int_log(bs, 16, "render_height_minus_1");
 	}
 	else {
 		//RenderWidth = UpscaledWidth;
@@ -4118,6 +4126,7 @@ GF_Err gf_av1_parse_obu(GF_BitStream *bs, ObuType *obu_type, u64 *obu_size, u32 
 	}
 	hdr_size = (u32)(gf_bs_get_position(bs) - pos);
 	if ((gf_bs_available(bs) < *obu_size) || state->bs_overread) {
+		printf("gf_bs_available: %llu obu_size: %llu\n", gf_bs_available(bs), *obu_size);
 		gf_bs_seek(bs, pos);
 		return GF_BUFFER_TOO_SMALL;
 	}
