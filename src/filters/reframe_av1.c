@@ -290,7 +290,7 @@ static void av1dmx_check_dur(GF_Filter *filter, GF_AV1DmxCtx *ctx)
 		gf_bs_seek(bs, ctx->file_hdr_size);
 	}
 	gf_av1_init_state(&av1state);
-	av1state.skip_frames = GF_TRUE;
+	av1state.skip_frames = GF_FALSE;
 	av1state.config = gf_odf_av1_cfg_new();
 
 	duration = 0;
@@ -845,7 +845,7 @@ GF_Err av1dmx_process_buffer(GF_Filter *filter, GF_AV1DmxCtx *ctx, const char *d
 {
 	u32 last_obu_end = 0;
 	GF_Err e = GF_OK;
-
+	printf("data_dize: %d\n", data_size);
 	if (!ctx->bs) ctx->bs = gf_bs_new(data, data_size, GF_BITSTREAM_READ);
 	else gf_bs_reassign_buffer(ctx->bs, data, data_size);
 

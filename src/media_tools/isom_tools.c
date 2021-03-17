@@ -3843,6 +3843,7 @@ GF_Err rfc_6381_get_codec_av1(char *szCodec, u32 subtype, GF_AV1Config *av1c)
 	gf_av1_init_state(&av1_state);
 	av1_state.config = av1c;
 
+	printf("rfc6381\n");
 	for (i = 0; i < gf_list_count(av1c->obu_array); ++i) {
 		GF_BitStream *bs;
 		GF_AV1_OBUArrayEntry *a = gf_list_get(av1c->obu_array, i);
